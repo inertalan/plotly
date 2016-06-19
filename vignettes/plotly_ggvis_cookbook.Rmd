@@ -20,6 +20,7 @@ The following examples show you how to create a selection of common graphics wit
 
 ```{r, message = FALSE}
 library(plotly)
+library(ggvis)
 library(dplyr)
 ```
 
@@ -61,6 +62,8 @@ mtcars %>%
 
 With a linear model, and 95% confidence interval for the model:
 
+**todo**
+
 ```{r, message = FALSE}
 mtcars %>% 
   ggvis(~wt, ~mpg) %>%
@@ -83,14 +86,16 @@ mtcars %>%
 
 Coloring points, and adding a smoother for each group. The grouping variable (which is applied before the `transform_smooth` is calculated) must be specified with `group_by()`:
 
+**todo**
+
 ```{r, message = FALSE}
 mtcars %>% 
   #ggvis(~wt, ~mpg, fill = ~factor(cyl)) %>% 
   plot_ly(x=~wt, y=~mpg, color=~factor(cyl)) %>%
   #layer_points() %>% 
-  add_markers() %>%
-  group_by(cyl) %>% 
-  layer_model_predictions(model = "lm")
+  add_markers()# %>%
+  #group_by(cyl) %>% 
+  #layer_model_predictions(model = "lm")
 ```
 
 ## Bar graphs
@@ -179,51 +184,128 @@ The bin selection can be controled by specifying `width` and at most one of `cen
 `boundary` of one of the bins.  `boundary` and `center` may be outside the range of 
 the data.
 
+**todo**
+**more informative exploration of histogram**
+
 ```{r, message = FALSE}
 faithful %>%
   #ggvis(~eruptions) %>%
-  plot_ly(
-    x=~eruptions, type="histogram",
-    #xbins=list(
-    #  start=1,llllll  
-    #  end=10,
-    #  size=.5
-    #),
-    nbinsx=20
-  )
+  plot_ly( x=~eruptions ) %>%
   #layer_histograms(width=0.5, boundary=0)
+  add_trace(
+    type="histogram",
+    xbins=list(
+      start=0,
+      end=10,
+      size=0.5
+    ),
+    autobinx=FALSE
+  )
 
-faithful %>% ggvis(~eruptions) %>% layer_histograms(width=0.5, center=0)
+# todo
+#  easy way to get ticks at center of bins
+#  and match our xbins settings
+faithful %>%
+  #ggvis(~eruptions) %>%
+  plot_ly( x=~eruptions ) %>%
+  #layer_histograms(width=0.5, center=0)
+  add_trace(
+    type="histogram",
+    xbins=list(
+      start=0,
+      end=10,
+      size=0.5
+    ),
+    autobinx=FALSE
+  ) %>%
+  layout(
+    xaxis=list(
+      tickmode="array",
+      tickvals=seq(0,10,0.5) + 0.25
+    )
+  )
+  
 ```
 
 Modify the fill color and bin width, and add titles for the axes, since the automatic titles aren't very informative:
 
+**todo**
+**add stroke color black on bars**
 
 ```{r, message = FALSE}
-faithful %>% ggvis(~eruptions, fill := "#fff8dc") %>%
-  layer_histograms(width = 0.25)
+faithful %>%
+  #ggvis(~eruptions, fill := "#fff8dc") %>%
+  plot_ly(x=~eruptions, marker=list(color="#fff8dc")) %>%
+  add_trace(
+    type="histogram",
+    autobinx=FALSE,
+    xbins=list(
+      start=0,
+      end=10,
+      size=0.25
+    )
+  )
+  #layer_histograms(width = 0.25)
 ```
 
 By default, when the number of integer values is small, bins will 
 be centered at integers and have a width of 1:
 
+**todo**
+**add description of defaults**
+
 ```{r, message = FALSE}
-cocaine %>% ggvis(~month, fill := "#fff8dc") %>%
-  layer_histograms() %>%
-  add_axis("x", title = "month") %>%
-  add_axis("y", title = "count")
+data(cocaine, package="ggvis")
+cocaine %>% 
+  #ggvis(~month, fill := "#fff8dc") %>%
+  plot_ly(x=~month, marker=list(color="#fff8dc")) %>%
+  #layer_histograms() %>%
+  add_trace(type="histogram") %>%
+  #add_axis("x", title = "month") %>%
+  #add_axis("y", title = "count")
+  layout(
+    xaxis=list(title="month"),
+    yaxis=list(title="count")
+  )
 ```
 
 This can be forced with 
 ```{r, message = FALSE}
-cocaine %>% ggvis(~month, fill := "#fff8dc") %>%
-  layer_histograms(width = 1, center = 0) %>%
-  add_axis("x", title = "month") %>%
-  add_axis("y", title = "count")
+cocaine %>%
+  #ggvis(~month, fill := "#fff8dc") %>%
+  plot_ly(x=~month, marker=list(color="#fff8dc")) %>%
+  #layer_histograms(width = 1, center = 0) %>%
+  add_trace(
+    type="histogram",
+    autobinx=FALSE,
+    xbins=list(
+      start=0,
+      end=12,
+      size=1
+    )
+  ) %>%
+  #add_axis("x", title = "month") %>%
+  #add_axis("y", title = "count")
+  layout(
+    xaxis=list(
+      title="month",
+      tickmode="array",
+      tickvals=0:12+0.5,
+      ticktext=0:12,
+      ticks="outside"
+    ),
+    yaxis=list(title="count"),
+    bargap=0.25
+  )
 ```
+
 ## Box plots
 
 ```{r message=FALSE, warning=FALSE}
-mtcars %>% ggvis(~factor(cyl), ~mpg) %>% layer_boxplots()
+mtcars %>%
+  #ggvis(~factor(cyl), ~mpg) %>%
+  plot_ly(x=~factor(cyl),y=~mpg) %>%
+  add_trace(type="box")
+  #layer_boxplots()
 ```
 
